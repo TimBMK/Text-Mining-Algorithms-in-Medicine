@@ -1,6 +1,5 @@
 # Zeitungsscrape Gesundheit + Algorithmen
 
-library(diezeit)
 library(tm)
 
 library(rvest)
@@ -14,45 +13,7 @@ library(readr)
 library(stopwords)
 library(xlsx)
 
-setwd("D:\\Stuff\\Uni\\MA Sozialwissenschaften Humboldt-Universität Berlin\\18 (SoSe)\\Technik Gesellschaft Kommunikation\\Gruppenarbeit Metaphern Analyse\\Data\\")
-
-#############################################################################
-
-setwd("D:\\Stuff\\Uni\\MA Sozialwissenschaften Humboldt-Universität Berlin\\18 (SoSe)\\Technik Gesellschaft Kommunikation\\Gruppenarbeit Metaphern Analyse\\Data\\Gesundheitskongress")
-
-kongress.files <- list.files(pattern = "pdf$")
-Rpdf <- readPDF(control = list(text = "-layout"))
-kongress.corpus <- Corpus(URISource(kongress.files), 
-                   readerControl = list(reader = Rpdf))
-kongress.corpus <- gsub("[^\x20-\x7E]", "", kongress.corpus)
-
-
-term_freq <- termFreq(kongress.corpus, control = list(removePunctuation = TRUE, stopwords("german"), removeNumbers = TRUE, tolower = TRUE))
-dm <- data.frame(word=names(term_freq), freq = term_freq)
-
-# wenig bis keine Erwähnung von Algorithmen -> Sample nicht relevant für Forschungsfrage
-
-
-setwd("D:\\Stuff\\Uni\\MA Sozialwissenschaften Humboldt-Universität Berlin\\18 (SoSe)\\Technik Gesellschaft Kommunikation\\Gruppenarbeit Metaphern Analyse\\Data")
-
-ZEIT_KEY <- "9afa747fc0edcb1c58b486dd449a2b9d529378ec13039a0e94c1"
-
-search1 <- zeit_search(endpoint = "content", query = c("gesundheit", "algorithmen"), limit = 100, sort=c("release_date", "desc"))
-
-# search: endpoint = keywords findet nur heraus, ob keyword vorhanden (?)
-
-search2 <- zeit_search(endpoint = "content", query = c("gesundheit+algorithmen"), limit = 100, sort=c("release_date", "desc"))
-# kein Unterschied, ob c("gesundheit", "algorithmen") oder c("gesundheit+algorithmen"). Wie bessere Treffer erzielen?
-
-
-search3 <- zeit_search(endpoint = "content", query = c("gesundheit", "algorithmen", "daten"), limit = 100, sort=c("release_date", "desc"))
-# q wird addiert, nicht kombiniert - je mehr keywords, desto mehr matches!
-
-
-search3 <- zeit_search(endpoint = "content", query = c("gesundheit%20algorithmen"), limit = 100, sort=c("release_date", "desc"))
-
-
-search4 <- zeit_search(endpoint = "content", query = c("algorithmen"), field = c("title", "supertitle"), limit = 100, sort=c("release_date", "desc"))
+# (nicht alle packages werden verwendet) #
 
 ###########################################################################
 
@@ -150,7 +111,7 @@ zeit_wordcount <- zeit_tidy %>% count(word, sort = TRUE)
 taz_urls <- list(
 "https://www.taz.de/Roboter-als-Hilfskraft-in-der-Pflege/!5504806/",      
 "https://www.taz.de/Archiv-Suche/!5495833&s=digital%2Bpflege/",             
-"https://www.taz.de/Archiv-Suche/!5497928&s=Künstliche%2BIntelligenz%2Bpflege/",                   
+"https://www.taz.de/Archiv-Suche/!5497928&s=KÃ¼nstliche%2BIntelligenz%2Bpflege/",                   
 "https://www.taz.de/Archiv-Suche/!5509062&s=digital%2Bpflege/",             "https://www.taz.de/Archiv-Suche/!5493197&s=therapie%2BKI/")
 
 Scraper(taz_urls, "taz", heading.css = ".sectbody", text.css = ".sectbody")
