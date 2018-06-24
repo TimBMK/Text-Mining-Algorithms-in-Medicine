@@ -72,8 +72,6 @@ scrape_stopwords <- tibble(word = c("typeof", "undefined", "if", "sde.init.initi
   
 
 ###### SZ ######
-################
-  
 SZ_urls <- list("http://www.sueddeutsche.de/digital/kuenstliche-intelligenz-eine-maschine-gegen-die-depression-1.3431873", "http://www.sueddeutsche.de/gesundheit/neuroinformatik-alarm-am-handgelenk-1.3512859", "http://www.sueddeutsche.de/gesundheit/nanotechnologie-mini-maschinen-im-leib-1.2695064", "http://www.sueddeutsche.de/news/gesundheit/gesundheit-wenn-das-pflaster-die-wunde-ueberwacht-dpa.urn-newsml-dpa-com-20090101-171113-99-845744", "http://www.sueddeutsche.de/news/gesundheit/gesundheit---potsdam-mit-app-gegen-rueckenschmerzen-neues-programm-der-aok-dpa.urn-newsml-dpa-com-20090101-180314-99-476136", "http://www.sueddeutsche.de/news/gesundheit/gesundheit-umfrage-viele-patienten-offen-fuer-robo-docs-dpa.urn-newsml-dpa-com-20090101-170509-99-374982")
 
 SZ <- data.frame(stringsAsFactors = F)
@@ -137,3 +135,36 @@ save(SZ_tidy, SZ_wordcount,
 write.xlsx(SZ_wordcount, file = "SZ_Wordcount.xlsx")
 write.xlsx(zeit_wordcount, file = "zeit_Wordcount.xlsx")
 write.xlsx(taz_wordcount, file = "taz_Wordcount.xlsx")
+
+
+
+######################################################
+# Comparative Word Frequencies #
+
+frequency <- bind_rows(mutate(SZ_tidy, outlet = "Süddeutsche Zeitung"),
+                       mutate(zeit_tidy, outlet = "Die Zeit"), 
+                       mutate(taz_tidy, outlet = "TAZ")) %>% 
+  mutate(word = str_extract(word, "[a-z'].*")) %>%
+  count(outlet, word) %>%
+  group_by(outlet) %>%
+  mutate(proportion = n / sum(n)) %>% 
+  select(-n) %>% 
+  spread(outlet, proportion) 
+
+
+
+plot_SZ_zeit <-   ggplot(frequency, aes(`Süddeutsche Zeitung`, `Die Zeit`)) +
+    geom_jitter(alpha = 0.1, size = 2.5, width = 0.25, height = 0.25) +
+    geom_text(aes(label = word), check_overlap = TRUE, vjust = 1.5) +
+    scale_x_log10(labels = percent_format()) +
+    scale_y_log10(labels = percent_format()) +
+    geom_abline(color = "red")
+
+
+
+plot_SZ_taz <-   ggplot(frequency, aes(`Süddeutsche Zeitung`, `TAZ`)) +
+    geom_jitter(alpha = 0.1, size = 2.5, width = 0.25, height = 0.25) +
+    geom_text(aes(label = word), check_overlap = TRUE, vjust = 1.5) +
+    scale_x_log10(labels = percent_format()) +
+    scale_y_log10(labels = percent_format()) +
+    geom_abline(color = "red")
